@@ -1,0 +1,25 @@
+{
+  "name": "vuejs-portfolio",
+  "version": "1.0.0",
+  "description": "Modern Vue 3 Portfolio for Shahul Hameed Badhusha Ansari",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vueuse/motion": "^3.0.3",
+    "animate.css": "^4.1.1",
+    "bootstrap": "^5.3.8",
+    "vue": "^3.4.0",
+    "vue-router": "^4.2.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.0",
+    "vite": "^5.0.0"
+  },
+  "keywords": ["vue", "portfolio", "vite", "bootstrap"],
+  "author": "Shahul Hameed Badhusha Ansari",
+  "license": "MIT"
+}
