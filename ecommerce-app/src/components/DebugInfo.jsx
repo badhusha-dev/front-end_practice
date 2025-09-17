@@ -1,8 +1,8 @@
 import React from 'react';
-import { useAuthStore } from '../features/auth/authStore';
+import { useAuth } from '../hooks/reduxHooks';
 
 const DebugInfo = () => {
-  const { user, isAuthenticated, isLoading } = useAuthStore();
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   return (
     <div className="fixed top-4 right-4 bg-black bg-opacity-75 text-white p-4 rounded-lg text-sm z-50">

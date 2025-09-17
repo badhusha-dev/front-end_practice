@@ -1,0 +1,15 @@
+{
+  "name": "E-commerce App",
+  "short_name": "EcommerceApp",
+  "description": "A modern e-commerce application with advanced features",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "categories": ["shopping", "business"],
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "/",
+  "prefer_related_applications": false
+}

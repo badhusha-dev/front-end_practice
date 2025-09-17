@@ -1,0 +1,417 @@
+type User {
+    id: ID!
+    email: String!
+    firstName: String!
+    lastName: String!
+    phoneNumber: String
+    role: UserRole!
+    riskProfile: RiskProfile!
+    active: Boolean!
+    createdAt: String!
+    updatedAt: String!
+    accounts: [Account!]!
+    goals: [Goal!]!
+}
+
+enum UserRole {
+    CUSTOMER
+    ADVISOR
+    ADMIN
+}
+
+enum RiskProfile {
+    CONSERVATIVE
+    MODERATE
+    AGGRESSIVE
+}
+
+type Account {
+    id: ID!
+    accountNumber: String!
+    accountName: String!
+    accountType: AccountType!
+    balance: Float!
+    active: Boolean!
+    createdAt: String!
+    updatedAt: String!
+    user: User!
+    holdings: [Holding!]!
+    transactions: [Transaction!]!
+}
+
+enum AccountType {
+    SAVINGS
+    INVESTMENT
+    RETIREMENT
+    EDUCATION
+}
+
+type Holding {
+    id: ID!
+    ticker: String!
+    assetName: String!
+    assetType: AssetType!
+    sector: String!
+    quantity: Float!
+    currentPrice: Float!
+    averageCost: Float!
+    marketValue: Float!
+    unrealizedGainLoss: Float!
+    unrealizedGainLossPercentage: Float!
+    createdAt: String!
+    updatedAt: String!
+    account: Account!
+}
+
+enum AssetType {
+    STOCK
+    BOND
+    ETF
+    MUTUAL_FUND
+    REIT
+    CRYPTO
+    COMMODITY
+}
+
+type Transaction {
+    id: ID!
+    transactionId: String!
+    transactionType: TransactionType!
+    ticker: String!
+    assetName: String!
+    quantity: Float!
+    price: Float!
+    amount: Float!
+    fees: Float!
+    totalAmount: Float!
+    description: String
+    status: TransactionStatus!
+    createdAt: String!
+    updatedAt: String!
+    account: Account!
+}
+
+enum TransactionType {
+    BUY
+    SELL
+    DIVIDEND
+    INTEREST
+    DEPOSIT
+    WITHDRAWAL
+    TRANSFER
+}
+
+enum TransactionStatus {
+    PENDING
+    COMPLETED
+    FAILED
+    CANCELLED
+}
+
+type Goal {
+    id: ID!
+    title: String!
+    description: String
+    goalType: GoalType!
+    priority: Priority!
+    targetAmount: Float!
+    currentAmount: Float!
+    targetDate: String!
+    startDate: String!
+    status: GoalStatus!
+    progressPercentage: Float!
+    createdAt: String!
+    updatedAt: String!
+    user: User!
+}
+
+enum GoalType {
+    RETIREMENT
+    EDUCATION
+    HOME_PURCHASE
+    EMERGENCY_FUND
+    VACATION
+    DEBT_PAYOFF
+    INVESTMENT
+}
+
+enum Priority {
+    LOW
+    MEDIUM
+    HIGH
+    CRITICAL
+}
+
+enum GoalStatus {
+    ACTIVE
+    COMPLETED
+    PAUSED
+    CANCELLED
+}
+
+type PortfolioSummary {
+    totalValue: Float!
+    totalGainLoss: Float!
+    totalGainLossPercentage: Float!
+    assetAllocation: [AssetAllocation!]!
+    sectorAllocation: [SectorAllocation!]!
+    topHoldings: [Holding!]!
+    recentTransactions: [Transaction!]!
+}
+
+type AssetAllocation {
+    assetType: AssetType!
+    value: Float!
+    percentage: Float!
+}
+
+type SectorAllocation {
+    sector: String!
+    value: Float!
+    percentage: Float!
+}
+
+type Report {
+    id: ID!
+    title: String!
+    type: ReportType!
+    generatedAt: String!
+    data: String!
+    user: User!
+}
+
+enum ReportType {
+    PORTFOLIO_SUMMARY
+    TRANSACTION_HISTORY
+    PERFORMANCE_ANALYSIS
+    TAX_REPORT
+    GOAL_PROGRESS
+}
+
+type AuthResponse {
+    token: String!
+    refreshToken: String!
+    user: User!
+}
+
+type PageInfo {
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    startCursor: String
+    endCursor: String
+}
+
+type UserConnection {
+    edges: [UserEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type UserEdge {
+    node: User!
+    cursor: String!
+}
+
+type AccountConnection {
+    edges: [AccountEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type AccountEdge {
+    node: Account!
+    cursor: String!
+}
+
+type HoldingConnection {
+    edges: [HoldingEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type HoldingEdge {
+    node: Holding!
+    cursor: String!
+}
+
+type TransactionConnection {
+    edges: [TransactionEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type TransactionEdge {
+    node: Transaction!
+    cursor: String!
+}
+
+type GoalConnection {
+    edges: [GoalEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type GoalEdge {
+    node: Goal!
+    cursor: String!
+}
+
+input UserInput {
+    email: String!
+    password: String!
+    firstName: String!
+    lastName: String!
+    phoneNumber: String
+    role: UserRole!
+    riskProfile: RiskProfile!
+}
+
+input UserUpdateInput {
+    firstName: String
+    lastName: String
+    phoneNumber: String
+    riskProfile: RiskProfile
+    active: Boolean
+}
+
+input AccountInput {
+    accountNumber: String!
+    accountName: String!
+    accountType: AccountType!
+    balance: Float
+}
+
+input HoldingInput {
+    ticker: String!
+    assetName: String!
+    assetType: AssetType!
+    sector: String!
+    quantity: Float!
+    currentPrice: Float!
+    averageCost: Float!
+}
+
+input TransactionInput {
+    transactionType: TransactionType!
+    ticker: String!
+    assetName: String!
+    quantity: Float!
+    price: Float!
+    fees: Float
+    description: String
+}
+
+input GoalInput {
+    title: String!
+    description: String
+    goalType: GoalType!
+    priority: Priority!
+    targetAmount: Float!
+    targetDate: String!
+    startDate: String!
+}
+
+input GoalUpdateInput {
+    title: String
+    description: String
+    priority: Priority
+    targetAmount: Float
+    currentAmount: Float
+    targetDate: String
+    status: GoalStatus
+}
+
+input LoginInput {
+    email: String!
+    password: String!
+}
+
+input HoldingFilter {
+    ticker: String
+    assetType: AssetType
+    sector: String
+}
+
+input TransactionFilter {
+    transactionType: TransactionType
+    ticker: String
+    status: TransactionStatus
+    startDate: String
+    endDate: String
+}
+
+input UserFilter {
+    role: UserRole
+    riskProfile: RiskProfile
+    active: Boolean
+}
+
+type Query {
+    # User queries
+    user(id: ID!): User
+    users(first: Int, after: String, filter: UserFilter): UserConnection!
+    me: User
+    
+    # Account queries
+    account(id: ID!): Account
+    accounts(first: Int, after: String): AccountConnection!
+    accountsByUser(userId: ID!, first: Int, after: String): AccountConnection!
+    
+    # Portfolio queries
+    portfolio(userId: ID!): PortfolioSummary!
+    holdings(accountId: ID!, first: Int, after: String, filter: HoldingFilter): HoldingConnection!
+    holding(id: ID!): Holding
+    
+    # Transaction queries
+    transactions(accountId: ID!, first: Int, after: String, filter: TransactionFilter): TransactionConnection!
+    transaction(id: ID!): Transaction
+    
+    # Goal queries
+    goals(userId: ID!, first: Int, after: String): GoalConnection!
+    goal(id: ID!): Goal
+    
+    # Report queries
+    reports(userId: ID!): [Report!]!
+    report(id: ID!): Report
+}
+
+type Mutation {
+    # Authentication
+    login(input: LoginInput!): AuthResponse!
+    refreshToken(refreshToken: String!): AuthResponse!
+    
+    # User mutations
+    createUser(input: UserInput!): User!
+    updateUser(id: ID!, input: UserUpdateInput!): User!
+    deleteUser(id: ID!): Boolean!
+    
+    # Account mutations
+    createAccount(input: AccountInput!): Account!
+    updateAccount(id: ID!, balance: Float): Account!
+    deleteAccount(id: ID!): Boolean!
+    
+    # Holding mutations
+    createHolding(accountId: ID!, input: HoldingInput!): Holding!
+    updateHolding(id: ID!, input: HoldingInput!): Holding!
+    deleteHolding(id: ID!): Boolean!
+    
+    # Transaction mutations
+    createTransaction(accountId: ID!, input: TransactionInput!): Transaction!
+    updateTransaction(id: ID!, status: TransactionStatus!): Transaction!
+    deleteTransaction(id: ID!): Boolean!
+    
+    # Goal mutations
+    createGoal(input: GoalInput!): Goal!
+    updateGoal(id: ID!, input: GoalUpdateInput!): Goal!
+    deleteGoal(id: ID!): Boolean!
+    
+    # Report mutations
+    generateReport(type: ReportType!): Report!
+}
+
+type Subscription {
+    transactionCreated(accountId: ID!): Transaction!
+    transactionUpdated(accountId: ID!): Transaction!
+    holdingUpdated(accountId: ID!): Holding!
+    goalProgressUpdated(userId: ID!): Goal!
+}

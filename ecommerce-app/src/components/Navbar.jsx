@@ -12,31 +12,35 @@ import {
   MdMic
 } from 'react-icons/md';
 import { IoLogOut } from 'react-icons/io5';
-import { useAuthStore } from '../features/auth/authStore';
-import { useCartStore } from '../features/cart/cartStore';
-import { useWishlistStore } from '../features/wishlist/wishlistStore';
-import { useComparisonStore } from '../features/comparison/comparisonStore';
+import { useAuth, useCart, useWishlist, useComparison } from '../hooks/reduxHooks';
 import InteractiveLogo from './3D/InteractiveLogo';
 import ThemeToggle from './ThemeToggle';
 import SearchAutocomplete from './SearchAutocomplete';
 import CartPreview3D from './3D/CartPreview3D';
 import VoiceSearch from './VoiceSearch';
 import NotificationCenter from './NotificationCenter';
+import AdvancedSearch from '../features/search/AdvancedSearch';
+import SearchFilters from '../features/search/SearchFilters';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const { user, isAuthenticated, logout } = useAuthStore();
-  const { itemCount } = useCartStore();
-  const { itemCount: wishlistCount } = useWishlistStore();
-  const { itemCount: comparisonCount } = useComparisonStore();
+  const { user, isAuthenticated, dispatch: authDispatch } = useAuth();
+  const { itemCount } = useCart();
+  const { items: wishlistItems } = useWishlist();
+  const { items: comparisonItems } = useComparison();
+  
+  const wishlistCount = wishlistItems.length;
+  const comparisonCount = comparisonItems.length;
   const navigate = useNavigate();
   const [showSearch, setShowSearch] = useState(false);
   const [show3DCart, setShow3DCart] = useState(false);
   const [showVoiceSearch, setShowVoiceSearch] = useState(false);
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [showSearchFilters, setShowSearchFilters] = useState(false);
 
   const handleLogout = () => {
-    logout();
+    authDispatch({ type: 'auth/logoutAsync' });
     navigate('/');
     setIsUserMenuOpen(false);
   };
@@ -77,34 +81,41 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Search Bar */}
-          <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
-            {showVoiceSearch ? (
-              <VoiceSearch 
-                onSearch={(term) => {
-                  navigate(`/products?search=${encodeURIComponent(term)}`);
-                  setShowVoiceSearch(false);
+          {/* Advanced Search Bar */}
+          <div className="hidden md:flex items-center flex-1 max-w-2xl mx-8">
+            {showAdvancedSearch ? (
+              <AdvancedSearch 
+                onSearch={(query) => {
+                  navigate(`/products?search=${encodeURIComponent(query)}`);
+                  setShowAdvancedSearch(false);
                 }}
-                placeholder="Search with your voice..."
+                className="w-full"
               />
-            ) : showSearch ? (
-              <SearchAutocomplete onClose={() => setShowSearch(false)} />
             ) : (
               <div className="relative w-full">
                 <MdSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"
-                  placeholder="Search products..."
-                  onFocus={() => setShowSearch(true)}
-                  className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Search products, brands, or categories..."
+                  onFocus={() => setShowAdvancedSearch(true)}
+                  className="w-full pl-10 pr-20 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
                 />
-                <button
-                  onClick={() => setShowVoiceSearch(true)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary-600"
-                  title="Voice search"
-                >
-                  <MdMic className="w-4 h-4" />
-                </button>
+                <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
+                  <button
+                    onClick={() => setShowSearchFilters(true)}
+                    className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                    title="Advanced Filters"
+                  >
+                    <MdSettings className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setShowVoiceSearch(true)}
+                    className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                    title="Voice search"
+                  >
+                    <MdMic className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -183,6 +194,14 @@ const Navbar = () => {
                     >
                       <MdPerson className="w-4 h-4" />
                       <span>Profile</span>
+                    </Link>
+                    <Link
+                      to="/dashboard"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      <MdSettings className="w-4 h-4" />
+                      <span>Dashboard</span>
                     </Link>
                     {isAdmin && (
                       <Link
@@ -280,6 +299,12 @@ const Navbar = () => {
           onClose={() => setShow3DCart(false)}
         />
       )}
+
+      {/* Search Filters */}
+      <SearchFilters
+        isOpen={showSearchFilters}
+        onClose={() => setShowSearchFilters(false)}
+      />
     </nav>
   );
 };

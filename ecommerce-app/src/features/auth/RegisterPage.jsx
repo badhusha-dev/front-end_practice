@@ -5,7 +5,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { toast } from 'react-toastify';
 import { MdVisibility, MdVisibilityOff, MdMail, MdLock, MdPerson } from 'react-icons/md';
-import { useAuthStore } from './authStore';
+import { useAuth } from '../../hooks/reduxHooks';
+import { registerAsync } from './authSlice';
 import Loading from '../../components/Loading';
 
 // Validation schema for registration form
@@ -35,7 +36,7 @@ const registerSchema = yup.object({
 const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { register: registerUser, isLoading, isAuthenticated } = useAuthStore();
+  const { dispatch, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const {
@@ -55,13 +56,13 @@ const RegisterPage = () => {
 
   const onSubmit = async (data) => {
     const { confirmPassword: _confirmPassword, ...userData } = data;
-    const result = await registerUser(userData);
+    const result = await dispatch(registerAsync(userData));
     
-    if (result.success) {
+    if (result.type.endsWith('/fulfilled')) {
       toast.success('Registration successful! Welcome to our store!');
       navigate('/', { replace: true });
     } else {
-      toast.error(result.error || 'Registration failed');
+      toast.error(result.payload || 'Registration failed');
     }
   };
 

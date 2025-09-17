@@ -1,10 +1,10 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '../features/auth/authStore';
+import { useAuth } from '../hooks/reduxHooks';
 
 // Protected route component that requires authentication
 const ProtectedRoute = ({ children, requireAdmin = false }) => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user } = useAuth();
   const location = useLocation();
 
   // Redirect to login if not authenticated

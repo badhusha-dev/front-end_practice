@@ -1,35 +1,34 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useComparisonStore } from './comparisonStore';
+import { useComparison, useCart, useWishlist } from '../../hooks/reduxHooks';
+import { addToCart } from '../cart/cartSlice';
+import { removeFromComparison } from './comparisonSlice';
+import { addToWishlist } from '../wishlist/wishlistSlice';
 import { MdClose, MdShoppingCart, MdFavorite } from 'react-icons/md';
-import { useCartStore } from '../cart/cartStore';
-import { useWishlistStore } from '../wishlist/wishlistStore';
-import { toast } from 'react-toastify';
-import { ErrorMessage, EmptyState } from '../../components/ErrorBoundary';
 
 const ComparisonPage = () => {
-  const { items, removeItem, clearComparison } = useComparisonStore();
-  const { addItem } = useCartStore();
-  const { addItem: addToWishlist } = useWishlistStore();
+  const { items, dispatch: comparisonDispatch } = useComparison();
+  const { dispatch: cartDispatch } = useCart();
+  const { dispatch: wishlistDispatch } = useWishlist();
 
   const handleAddToCart = (product) => {
-    addItem(product, 1);
+    cartDispatch(addToCart(product));
     toast.success(`${product.name} added to cart!`);
   };
 
   const handleAddToWishlist = (product) => {
-    addToWishlist(product);
+    wishlistDispatch(addToWishlist(product));
     toast.success(`${product.name} added to wishlist!`);
   };
 
   const handleRemoveItem = (product) => {
-    removeItem(product.id);
+    comparisonDispatch(removeFromComparison(product.id));
     toast.success(`${product.name} removed from comparison!`);
   };
 
   const handleClearComparison = () => {
     if (window.confirm('Are you sure you want to clear the comparison?')) {
-      clearComparison();
+      comparisonDispatch({ type: 'comparison/clearComparison' });
       toast.success('Comparison cleared!');
     }
   };

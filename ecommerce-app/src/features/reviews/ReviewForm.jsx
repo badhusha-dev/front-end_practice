@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MdStar, MdStarBorder } from 'react-icons/md';
-import { useAuthStore } from '../auth/authStore';
+import { useAuth } from '../../hooks/reduxHooks';
 import { useReviewsStore } from './reviewsStore';
 import { toast } from 'react-toastify';
 
@@ -11,7 +11,7 @@ const ReviewForm = ({ productId, onReviewAdded }) => {
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const { addReview } = useReviewsStore();
 
   const handleSubmit = async (e) => {

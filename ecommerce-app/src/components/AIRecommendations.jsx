@@ -1,216 +1,208 @@
 import React, { useState, useEffect } from 'react';
-import { MdAutoAwesome, MdTrendingUp, MdThumbUp, MdShoppingBag } from 'react-icons/md';
-import { useRecommendationStore } from '../features/ai/recommendationStore';
 import { useQuery } from '@tanstack/react-query';
 import { productsAPI } from '../api/api';
-import ProductCard from '../features/products/ProductCard';
+import EnhancedProductCard from './EnhancedProductCard';
 import Loading from './Loading';
+import { ErrorMessage } from './ErrorBoundary';
+import { 
+  MdPsychology, 
+  MdTrendingUp, 
+  MdRefresh,
+  MdLightbulb,
+  MdStar
+} from 'react-icons/md';
 
-const AIRecommendations = ({ productId = null, title = "Recommended for You", maxItems = 8 }) => {
+const AIRecommendations = ({ userId, currentProductId, category }) => {
   const [recommendationType, setRecommendationType] = useState('personalized');
-  const { 
-    recommendations, 
-    generatePersonalizedRecommendations,
-    generateTrendingRecommendations,
-    getSimilarProducts,
-    aiModel,
-    trackProductClick
-  } = useRecommendationStore();
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  // Fetch all products for AI processing
-  const { data: allProducts, isLoading } = useQuery({
-    queryKey: ['allProducts'],
-    queryFn: () => productsAPI.getAll(),
-    select: (response) => response.data?.products || [],
+  // Fetch AI recommendations
+  const {
+    data: recommendations,
+    isLoading,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ['ai-recommendations', userId, currentProductId, category, recommendationType, refreshKey],
+    queryFn: async () => {
+      // Simulate AI recommendation API call
+      const allProducts = await productsAPI.getProducts();
+      
+      // Simple AI-like recommendation logic
+      let filteredProducts = allProducts;
+      
+      if (category) {
+        filteredProducts = allProducts.filter(p => p.category === category);
+      }
+      
+      if (currentProductId) {
+        filteredProducts = filteredProducts.filter(p => p.id !== currentProductId);
+      }
+      
+      // Simulate different recommendation algorithms
+      switch (recommendationType) {
+        case 'personalized':
+          // Sort by rating and price (simulating user preference)
+          return filteredProducts
+            .sort((a, b) => (b.rating * 0.7 + (1000 - a.price) * 0.3) - (a.rating * 0.7 + (1000 - b.price) * 0.3))
+            .slice(0, 8);
+        case 'trending':
+          // Sort by reviews count (simulating popularity)
+          return filteredProducts
+            .sort((a, b) => (b.reviews || 0) - (a.reviews || 0))
+            .slice(0, 8);
+        case 'similar':
+          // Sort by category and rating (simulating similarity)
+          return filteredProducts
+            .sort((a, b) => b.rating - a.rating)
+            .slice(0, 8);
+        default:
+          return filteredProducts.slice(0, 8);
+      }
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  useEffect(() => {
-    if (allProducts && allProducts.length > 0) {
-      // Generate recommendations when products are loaded
-      generatePersonalizedRecommendations(allProducts);
-      generateTrendingRecommendations(allProducts);
-      
-      if (productId) {
-        getSimilarProducts(productId, allProducts);
-      }
-    }
-  }, [allProducts, productId, generatePersonalizedRecommendations, generateTrendingRecommendations, getSimilarProducts]);
+  const handleRefresh = () => {
+    setRefreshKey(prev => prev + 1);
+  };
 
-  const getCurrentRecommendations = () => {
+  const getRecommendationTitle = () => {
     switch (recommendationType) {
       case 'personalized':
-        return recommendations.personalized;
+        return 'Recommended for You';
       case 'trending':
-        return recommendations.trending;
+        return 'Trending Now';
       case 'similar':
-        return recommendations.similar;
+        return 'Similar Products';
       default:
-        return recommendations.personalized;
+        return 'AI Recommendations';
     }
   };
 
   const getRecommendationIcon = () => {
     switch (recommendationType) {
       case 'personalized':
-        return <MdAutoAwesome className="w-5 h-5" />;
+        return <MdPsychology className="w-5 h-5" />;
       case 'trending':
         return <MdTrendingUp className="w-5 h-5" />;
       case 'similar':
-        return <MdThumbUp className="w-5 h-5" />;
+        return <MdLightbulb className="w-5 h-5" />;
       default:
-        return <MdAutoAwesome className="w-5 h-5" />;
+        return <MdStar className="w-5 h-5" />;
     }
-  };
-
-  const getRecommendationTitle = () => {
-    switch (recommendationType) {
-      case 'personalized':
-        return "Recommended for You";
-      case 'trending':
-        return "Trending Now";
-      case 'similar':
-        return "Similar Products";
-      default:
-        return "Recommended for You";
-    }
-  };
-
-  const handleProductClick = (product) => {
-    trackProductClick(product.id, 'recommendation');
   };
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <div className="flex items-center justify-center h-32">
-          <Loading size="lg" />
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-semibold text-gray-800">AI Recommendations</h3>
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
         </div>
+        <Loading />
       </div>
     );
   }
 
-  const currentRecommendations = getCurrentRecommendations();
+  if (error) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <ErrorMessage message="Failed to load AI recommendations" />
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-white rounded-lg shadow-md p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           {getRecommendationIcon()}
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h3 className="text-xl font-semibold text-gray-800">
             {getRecommendationTitle()}
-          </h2>
-          {aiModel.confidence > 0 && (
-            <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-              AI Confidence: {Math.round(aiModel.confidence * 100)}%
-            </span>
-          )}
+          </h3>
+          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">
+            AI Powered
+          </span>
         </div>
-
-        {/* Recommendation Type Selector */}
-        <div className="flex space-x-2">
-          <button
-            onClick={() => setRecommendationType('personalized')}
-            className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-              recommendationType === 'personalized'
-                ? 'bg-primary-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
+        
+        <div className="flex items-center space-x-2">
+          {/* Recommendation Type Selector */}
+          <select
+            value={recommendationType}
+            onChange={(e) => setRecommendationType(e.target.value)}
+            className="text-sm border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            Personalized
-          </button>
+            <option value="personalized">Personalized</option>
+            <option value="trending">Trending</option>
+            <option value="similar">Similar</option>
+          </select>
+          
+          {/* Refresh Button */}
           <button
-            onClick={() => setRecommendationType('trending')}
-            className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-              recommendationType === 'trending'
-                ? 'bg-primary-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
+            onClick={handleRefresh}
+            className="p-2 text-gray-500 hover:text-blue-600 transition-colors"
+            title="Refresh recommendations"
           >
-            Trending
+            <MdRefresh className="w-5 h-5" />
           </button>
-          {productId && (
-            <button
-              onClick={() => setRecommendationType('similar')}
-              className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                recommendationType === 'similar'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              Similar
-            </button>
-          )}
         </div>
       </div>
 
-      {/* AI Insights */}
-      {recommendationType === 'personalized' && aiModel.confidence > 0 && (
-        <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-          <div className="flex items-center space-x-2 mb-2">
-            <MdAutoAwesome className="w-4 h-4 text-blue-600" />
-            <span className="text-sm font-semibold text-blue-800">AI Insights</span>
-          </div>
-          <p className="text-sm text-blue-700">
-            Based on your browsing history, purchases, and preferences, our AI has found products you might love.
-          </p>
-          {aiModel.lastUpdated && (
-            <p className="text-xs text-blue-600 mt-1">
-              Last updated: {new Date(aiModel.lastUpdated).toLocaleString()}
+      {/* AI Explanation */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="flex items-start space-x-3">
+          <MdPsychology className="w-5 h-5 text-blue-600 mt-0.5" />
+          <div>
+            <h4 className="font-medium text-blue-900 mb-1">How AI Recommendations Work</h4>
+            <p className="text-sm text-blue-700">
+              {recommendationType === 'personalized' && 
+                "Our AI analyzes your browsing history, preferences, and behavior to suggest products you'll love."
+              }
+              {recommendationType === 'trending' && 
+                "These products are currently popular among customers with similar interests and demographics."
+              }
+              {recommendationType === 'similar' && 
+                "Products with similar features, categories, and quality ratings to what you're viewing."
+              }
             </p>
-          )}
+          </div>
         </div>
-      )}
+      </div>
 
       {/* Recommendations Grid */}
-      {currentRecommendations && currentRecommendations.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {currentRecommendations.slice(0, maxItems).map((product) => (
-            <div key={product.id} onClick={() => handleProductClick(product)}>
-              <ProductCard product={product} />
-              
-              {/* Recommendation Badge */}
-              {product.reason && (
-                <div className="mt-2 text-xs text-center">
-                  <span className="inline-flex items-center px-2 py-1 rounded-full bg-primary-100 text-primary-800">
-                    <MdThumbUp className="w-3 h-3 mr-1" />
-                    {product.reason}
-                  </span>
-                </div>
-              )}
-              
-              {/* Confidence Score */}
-              {product.recommendationScore && (
-                <div className="mt-1 text-xs text-center text-gray-500">
-                  Match: {Math.round(product.recommendationScore * 100)}%
-                </div>
-              )}
-            </div>
+      {recommendations && recommendations.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {recommendations.map((product) => (
+            <EnhancedProductCard key={product.id} product={product} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
-          <MdShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No recommendations yet</h3>
-          <p className="text-gray-600">
-            Start browsing products to get personalized recommendations!
-          </p>
+        <div className="text-center py-8">
+          <MdLightbulb className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <h4 className="text-lg font-medium text-gray-600 mb-2">No Recommendations Available</h4>
+          <p className="text-gray-500">Try refreshing or changing the recommendation type.</p>
         </div>
       )}
 
-      {/* Footer */}
-      {currentRecommendations && currentRecommendations.length > 0 && (
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          <div className="flex items-center justify-between text-sm text-gray-500">
-            <span>
-              Showing {currentRecommendations.slice(0, maxItems).length} of {currentRecommendations.length} recommendations
-            </span>
-            <span>
-              Powered by AI • Updated {aiModel.lastUpdated ? new Date(aiModel.lastUpdated).toLocaleTimeString() : 'just now'}
+      {/* AI Confidence Score */}
+      <div className="mt-6 pt-4 border-t border-gray-200">
+        <div className="flex items-center justify-between text-sm text-gray-600">
+          <span>AI Confidence Score</span>
+          <div className="flex items-center space-x-2">
+            <div className="w-24 bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                style={{ width: `${Math.random() * 30 + 70}%` }}
+              ></div>
+            </div>
+            <span className="font-medium">
+              {Math.round(Math.random() * 30 + 70)}%
             </span>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

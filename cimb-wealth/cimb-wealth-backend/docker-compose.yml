@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: cimb-wealth-postgres
+    environment:
+      POSTGRES_DB: cimb_wealth
+      POSTGRES_USER: cimb_user
+      POSTGRES_PASSWORD: cimb_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - cimb-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cimb_user -d cimb_wealth"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: cimb-wealth-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@cimb.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "8081:80"
+    depends_on:
+      - postgres
+    networks:
+      - cimb-network
+
+  app:
+    build: .
+    container_name: cimb-wealth-backend
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DATABASE_URL: jdbc:postgresql://postgres:5432/cimb_wealth
+      DATABASE_USERNAME: cimb_user
+      DATABASE_PASSWORD: cimb_password
+      JWT_SECRET: cimb-wealth-super-secret-key-for-development-only-change-in-production
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - cimb-network
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  postgres_data:
+
+networks:
+  cimb-network:
+    driver: bridge

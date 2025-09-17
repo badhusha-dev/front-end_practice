@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { MdStar, MdThumbUp, MdReport, MdEdit, MdDelete, MdPerson } from 'react-icons/md';
-import { useSocialStore } from '../features/social/socialStore';
-import { useAuthStore } from '../features/auth/authStore';
+import { useAuth } from '../hooks/reduxHooks';
 
 const ProductReviews = ({ productId, productName }) => {
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -13,17 +12,41 @@ const ProductReviews = ({ productId, productName }) => {
     verified: false
   });
 
-  const { user, isAuthenticated } = useAuthStore();
-  const {
-    reviews,
-    getProductReviews,
-    getProductRating,
-    addReview,
-    updateReview,
-    deleteReview,
-    markReviewHelpful,
-    reportReview
-  } = useSocialStore();
+  const { user, isAuthenticated } = useAuth();
+  
+  // Mock data for reviews since social store is not implemented
+  const reviews = [
+    {
+      id: 1,
+      userId: 'user1',
+      userName: 'John Doe',
+      rating: 5,
+      title: 'Great product!',
+      comment: 'Really happy with this purchase. Quality is excellent.',
+      date: '2024-01-15',
+      verified: true,
+      helpful: 12
+    },
+    {
+      id: 2,
+      userId: 'user2',
+      userName: 'Jane Smith',
+      rating: 4,
+      title: 'Good value',
+      comment: 'Good product for the price. Would recommend.',
+      date: '2024-01-10',
+      verified: false,
+      helpful: 8
+    }
+  ];
+  
+  const getProductRating = () => {
+    if (reviews.length === 0) return 0;
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    return totalRating / reviews.length;
+  };
+  
+  const getProductReviews = () => reviews;
 
   const productReviews = getProductReviews(productId);
   const rating = getProductRating(productId);

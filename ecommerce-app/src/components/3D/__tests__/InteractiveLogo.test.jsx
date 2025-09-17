@@ -33,9 +33,11 @@ vi.mock('three', () => ({
 
 // Mock the actual InteractiveLogo component to avoid Three.js issues
 vi.mock('../InteractiveLogo', () => ({
-  default: ({ size, showText, className }) => (
+  default: ({ size = 'medium', showText = false, className = '' }) => (
     <div data-testid="interactive-logo" className={className}>
-      Logo {size} {showText ? 'with text' : 'without text'}
+      <span>Logo</span>
+      <span>{size}</span>
+      <span>{showText ? 'with text' : 'without text'}</span>
     </div>
   )
 }));

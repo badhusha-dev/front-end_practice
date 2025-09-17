@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -17,8 +17,9 @@ import { productsAPI } from '../api/api';
 import ProductCard from '../features/products/ProductCard';
 import Loading, { InlineLoading } from '../components/Loading';
 import { ErrorMessage } from '../components/ErrorBoundary';
-import ProductViewer3D from '../components/3D/ProductViewer3D';
-import AnimatedBackground from '../components/3D/AnimatedBackground';
+const ProductViewer3D = lazy(() => import('../components/3D/ProductViewer3D'));
+const AnimatedBackground = lazy(() => import('../components/3D/AnimatedBackground'));
+const ThreeDShowcase = lazy(() => import('../components/3D/ThreeDShowcase'));
 
 const HomePage = () => {
   // Fetch featured products
@@ -71,7 +72,9 @@ const HomePage = () => {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative text-white overflow-hidden">
-        <AnimatedBackground className="absolute inset-0" />
+        <Suspense fallback={null}>
+          <AnimatedBackground className="absolute inset-0" />
+        </Suspense>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -100,9 +103,21 @@ const HomePage = () => {
               </div>
             </div>
             <div className="hidden lg:block">
-              <ProductViewer3D className="w-full h-96 rounded-lg overflow-hidden" />
+              <Suspense fallback={null}>
+                <ProductViewer3D className="w-full h-96 rounded-lg overflow-hidden" />
+              </Suspense>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* 3D Showcase Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Explore Our 3D UI</h2>
+          <Suspense fallback={null}>
+            <ThreeDShowcase />
+          </Suspense>
         </div>
       </section>
 

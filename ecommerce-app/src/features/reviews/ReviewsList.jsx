@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MdStar, MdThumbUp, MdFlag, MdMoreVert } from 'react-icons/md';
 import { useReviewsStore } from './reviewsStore';
-import { useAuthStore } from '../auth/authStore';
+import { useAuth } from '../../hooks/reduxHooks';
 import { toast } from 'react-toastify';
 
 const ReviewsList = ({ productId }) => {
@@ -10,7 +10,8 @@ const ReviewsList = ({ productId }) => {
   const [expandedReview, setExpandedReview] = useState(null);
 
   const { getReviews, getAverageRating, getRatingDistribution, markHelpful, reportReview, deleteReview } = useReviewsStore();
-  const { user, isAdmin } = useAuthStore();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
 
   const reviews = getReviews(productId);
   const averageRating = getAverageRating(productId);
@@ -231,7 +232,7 @@ const ReviewsList = ({ productId }) => {
               </div>
 
               {/* Admin/Author Actions */}
-              {(isAdmin() || (user && user.id === review.userId)) && (
+              {(isAdmin || (user && user.id === review.userId)) && (
                 <div className="relative">
                   <button className="p-1 text-gray-400 hover:text-gray-600">
                     <MdMoreVert className="w-5 h-5" />

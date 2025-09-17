@@ -1,32 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { MdStar, MdShoppingCart, MdVisibility, MdFavorite, MdFavoriteBorder, MdCompare, MdCompareArrows, Md3dRotation } from 'react-icons/md';
-import { useCartStore } from '../cart/cartStore';
-import { useWishlistStore } from '../wishlist/wishlistStore';
-import { useComparisonStore } from '../comparison/comparisonStore';
+import { useCart, useWishlist, useComparison } from '../../hooks/reduxHooks';
+import { addToCart } from '../cart/cartSlice';
+import { addToWishlist, removeFromWishlist } from '../wishlist/wishlistSlice';
+import { addToComparison } from '../comparison/comparisonSlice';
 import { useRecommendationStore } from '../ai/recommendationStore';
 import { useGamificationStore } from '../gamification/gamificationStore';
-import ARProductViewer from '../../components/AR/ARProductViewer';
-import SocialShare from '../../components/SocialShare';
+const ARProductViewer = lazy(() => import('../../components/AR/ARProductViewer'));
+const SocialShare = lazy(() => import('../../components/SocialShare'));
 import { toast } from 'react-toastify';
 
 // Product card component for displaying products in grid
-const ProductCard = ({ product }) => {
+const ProductCard = React.memo(({ product }) => {
   const [showAR, setShowAR] = useState(false);
-  const { addItem, isInCart, getItemQuantity } = useCartStore();
-  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
-  const { addItem: addToComparison, removeItem: removeFromComparison, isInComparison, isFull } = useComparisonStore();
+  const [hasTrackedView, setHasTrackedView] = useState(false);
+  const { dispatch: cartDispatch, items: cartItems } = useCart();
+  const { dispatch: wishlistDispatch, items: wishlistItems } = useWishlist();
+  const { dispatch: comparisonDispatch, items: comparisonItems } = useComparison();
+  
+  // Helper functions
+  const isInCart = cartItems.some(item => item.id === product.id);
+  const getItemQuantity = (productId) => {
+    const item = cartItems.find(item => item.id === productId);
+    return item ? item.quantity : 0;
+  };
+  const isInWishlist = wishlistItems.some(item => item.id === product.id);
+  const isInComparison = comparisonItems.some(item => item.id === product.id);
+  const isFull = comparisonItems.length >= 4;
   const { trackProductView, trackProductClick } = useRecommendationStore();
   const { addPoints } = useGamificationStore();
 
-  const handleAddToCart = (e) => {
+  const handleAddToCart = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem(product, 1);
+    cartDispatch(addToCart(product));
     toast.success(`${product.name} added to cart!`);
-  };
+  }, [cartDispatch, product]);
 
-  const handleWishlistToggle = (e) => {
+  const handleWishlistToggle = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
     
@@ -37,9 +49,9 @@ const ProductCard = ({ product }) => {
       addToWishlist(product);
       toast.success(`${product.name} added to wishlist!`);
     }
-  };
+  }, [addToWishlist, isInWishlist, product, removeFromWishlist]);
 
-  const handleComparisonToggle = (e) => {
+  const handleComparisonToggle = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
     
@@ -54,18 +66,25 @@ const ProductCard = ({ product }) => {
       addToComparison(product);
       toast.success(`${product.name} added to comparison!`);
     }
-  };
+  }, [addToComparison, isFull, isInComparison, product, removeFromComparison]);
+
+  const handleHoverViewTrack = useCallback(() => {
+    if (!hasTrackedView) {
+      trackProductView(product.id);
+      setHasTrackedView(true);
+    }
+  }, [hasTrackedView, product.id, trackProductView]);
 
   const quantity = getItemQuantity(product.id);
   const inCart = isInCart(product.id);
   const inWishlist = isInWishlist(product.id);
   const inComparison = isInComparison(product.id);
 
-  // Generate star rating display
-  const renderStars = (rating) => {
+  // Memoized star rating display
+  const ratingStars = useMemo(() => {
     const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
+    const fullStars = Math.floor(product.rating);
+    const hasHalfStar = product.rating % 1 !== 0;
 
     for (let i = 0; i < fullStars; i++) {
       stars.push(<MdStar key={i} className="w-4 h-4 text-yellow-400 fill-current" />);
@@ -73,7 +92,7 @@ const ProductCard = ({ product }) => {
 
     if (hasHalfStar) {
       stars.push(
-        <div key="half" className="relative w-4 h-4">
+        <div key="half" className="relative w-4 h-4" aria-hidden="true">
           <MdStar className="w-4 h-4 text-gray-300 fill-current" />
           <div className="absolute inset-0 w-2 h-4 overflow-hidden">
             <MdStar className="w-4 h-4 text-yellow-400 fill-current" />
@@ -82,36 +101,38 @@ const ProductCard = ({ product }) => {
       );
     }
 
-    const remainingStars = 5 - Math.ceil(rating);
+    const remainingStars = 5 - Math.ceil(product.rating);
     for (let i = 0; i < remainingStars; i++) {
       stars.push(<MdStar key={`empty-${i}`} className="w-4 h-4 text-gray-300 fill-current" />);
     }
 
     return stars;
-  };
+  }, [product.rating]);
 
   return (
     <div className="group bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
-      <Link to={`/products/${product.id}`} className="block">
+      <Link to={`/products/${product.id}`} className="block" onMouseEnter={handleHoverViewTrack}>
         {/* Product Image */}
         <div className="relative aspect-w-4 aspect-h-3 overflow-hidden">
           <img
             src={product.image}
-            alt={product.name}
+            alt={`${product.name} - ${product.category}`}
             className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
+            decoding="async"
+            fetchpriority="low"
+            width="400"
+            height="300"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
           
           {/* Quick View Overlay */}
           <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
             <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  window.location.href = `/products/${product.id}`;
-                }}
+                type="button"
                 className="bg-white text-gray-800 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                aria-label="Quick view"
               >
                 <MdVisibility className="w-5 h-5" />
               </button>
@@ -132,6 +153,8 @@ const ProductCard = ({ product }) => {
               onClick={handleWishlistToggle}
               className="p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors duration-200"
               title={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+              aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+              aria-pressed={inWishlist}
             >
               {inWishlist ? (
                 <MdFavorite className="w-4 h-4 text-red-500 fill-current" />
@@ -149,6 +172,8 @@ const ProductCard = ({ product }) => {
                   : 'bg-white text-gray-600 hover:bg-gray-100'
               }`}
               title={inComparison ? 'Remove from comparison' : 'Add to comparison'}
+              aria-label={inComparison ? 'Remove from comparison' : 'Add to comparison'}
+              aria-pressed={inComparison}
             >
               {inComparison ? (
                 <MdCompare className="w-4 h-4" />
@@ -168,6 +193,7 @@ const ProductCard = ({ product }) => {
               }}
               className="p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors duration-200"
               title="View in AR"
+              aria-label="View in AR"
             >
               <Md3dRotation className="w-4 h-4 text-purple-600" />
             </button>
@@ -175,7 +201,9 @@ const ProductCard = ({ product }) => {
 
           {/* Social Share Button */}
           <div className="absolute top-2 right-2">
-            <SocialShare product={product} size="sm" />
+            <Suspense fallback={null}>
+              <SocialShare product={product} size="sm" />
+            </Suspense>
           </div>
         </div>
 
@@ -199,7 +227,7 @@ const ProductCard = ({ product }) => {
           {/* Rating */}
           <div className="flex items-center mt-3 space-x-1">
             <div className="flex items-center">
-              {renderStars(product.rating)}
+              {ratingStars}
             </div>
             <span className="text-sm text-gray-600">
               ({product.reviews} reviews)
@@ -246,14 +274,16 @@ const ProductCard = ({ product }) => {
 
       {/* AR Viewer Modal */}
       {showAR && (
-        <ARProductViewer
-          product={product}
-          isOpen={showAR}
-          onClose={() => setShowAR(false)}
-        />
+        <Suspense fallback={null}>
+          <ARProductViewer
+            product={product}
+            isOpen={showAR}
+            onClose={() => setShowAR(false)}
+          />
+        </Suspense>
       )}
     </div>
   );
-};
+});
 
 export default ProductCard;

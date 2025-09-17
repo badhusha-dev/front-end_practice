@@ -12,8 +12,8 @@ import {
   MdLock,
   MdCheckCircle
 } from 'react-icons/md';
-import { useCartStore } from '../cart/cartStore';
-import { useAuthStore } from '../auth/authStore';
+import { useCart, useAuth } from '../../hooks/reduxHooks';
+import { clearCart } from '../cart/cartSlice';
 import Loading from '../../components/Loading';
 import { EmptyState } from '../../components/ErrorBoundary';
 import { MdShoppingBag } from 'react-icons/md';
@@ -70,8 +70,8 @@ const CheckoutPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const navigate = useNavigate();
-  const { items, total, itemCount, clearCart } = useCartStore();
-  const { user } = useAuthStore();
+  const { items, total, itemCount, dispatch: cartDispatch } = useCart();
+  const { user } = useAuth();
 
   const {
     register,
@@ -146,7 +146,7 @@ const CheckoutPage = () => {
       console.log('Order data:', orderData);
 
       // Clear cart and show success
-      clearCart();
+      cartDispatch(clearCart());
       setOrderSuccess(true);
 
       toast.success('Order placed successfully!');

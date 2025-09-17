@@ -61,7 +61,7 @@ const ARProductViewer = ({ product, isOpen, onClose }) => {
     return () => {
       stopCamera();
     };
-  }, []);
+  }, [stopCamera]);
 
   if (!isOpen) return null;
 

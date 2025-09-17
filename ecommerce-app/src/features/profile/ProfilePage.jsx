@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { useAuthStore } from '../auth/authStore';
-import { useWishlistStore } from '../wishlist/wishlistStore';
+import { useAuth, useWishlist } from '../../hooks/reduxHooks';
 import { useReviewsStore } from '../reviews/reviewsStore';
 import { MdPerson, MdEmail, MdPhone, MdLocationOn, MdEdit, MdSave, MdCancel, MdFavorite, MdStar, MdShoppingCart, MdHistory } from 'react-icons/md';
 import { toast } from 'react-toastify';
 
 const ProfilePage = () => {
-  const { user, updateProfile } = useAuthStore();
-  const { items: wishlistItems, itemCount: wishlistCount } = useWishlistStore();
+  const { user } = useAuth();
+  const { items: wishlistItems } = useWishlist();
+  
+  const wishlistCount = wishlistItems.length;
   const { getUserReviews } = useReviewsStore();
 
   const [isEditing, setIsEditing] = useState(false);

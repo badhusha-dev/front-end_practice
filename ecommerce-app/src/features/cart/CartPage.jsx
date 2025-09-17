@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MdRemove, MdAdd, MdDelete, MdShoppingBag, MdArrowBack } from 'react-icons/md';
-import { useCartStore } from './cartStore';
+import { useCart } from '../../hooks/reduxHooks';
+import { updateCartItemQuantity, removeFromCart, clearCart } from './cartSlice';
 import { EmptyState } from '../../components/ErrorBoundary';
 
 const CartPage = () => {
@@ -9,17 +10,15 @@ const CartPage = () => {
     items, 
     total, 
     itemCount, 
-    updateQuantity, 
-    removeItem, 
-    clearCart 
-  } = useCartStore();
+    dispatch 
+  } = useCart();
 
   const handleQuantityChange = (productId, newQuantity) => {
-    updateQuantity(productId, newQuantity);
+    dispatch(updateCartItemQuantity({ productId, quantity: newQuantity }));
   };
 
   const handleRemoveItem = (productId) => {
-    removeItem(productId);
+    dispatch(removeFromCart(productId));
   };
 
   if (itemCount === 0) {

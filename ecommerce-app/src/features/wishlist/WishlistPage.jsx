@@ -1,29 +1,32 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useWishlistStore } from './wishlistStore';
-import { useCartStore } from '../cart/cartStore';
+import { useWishlist, useCart } from '../../hooks/reduxHooks';
+import { addToCart } from '../cart/cartSlice';
+import { removeFromWishlist } from './wishlistSlice';
 import { MdFavorite, MdShoppingCart, MdRemove, MdDelete } from 'react-icons/md';
 import { toast } from 'react-toastify';
 import { ErrorMessage, EmptyState } from '../../components/ErrorBoundary';
 
 const WishlistPage = () => {
-  const { items, itemCount, removeItem, clearWishlist, moveToCart } = useWishlistStore();
-  const { addItem } = useCartStore();
+  const { items, dispatch: wishlistDispatch } = useWishlist();
+  const { dispatch: cartDispatch } = useCart();
+  
+  const itemCount = items.length;
 
   const handleMoveToCart = (product) => {
-    addItem(product, 1);
-    removeItem(product.id);
+    cartDispatch(addToCart(product));
+    wishlistDispatch(removeFromWishlist(product.id));
     toast.success(`${product.name} moved to cart!`);
   };
 
   const handleRemoveItem = (product) => {
-    removeItem(product.id);
+    wishlistDispatch(removeFromWishlist(product.id));
     toast.success(`${product.name} removed from wishlist!`);
   };
 
   const handleClearWishlist = () => {
     if (window.confirm('Are you sure you want to clear your wishlist?')) {
-      clearWishlist();
+      wishlistDispatch({ type: 'wishlist/clearWishlist' });
       toast.success('Wishlist cleared!');
     }
   };

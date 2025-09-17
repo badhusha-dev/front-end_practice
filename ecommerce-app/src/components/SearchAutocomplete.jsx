@@ -19,6 +19,8 @@ const SearchAutocomplete = ({ onClose }) => {
   
   const navigate = useNavigate();
   const searchRef = useRef(null);
+  const cacheRef = useRef(new Map()); // key: query -> { data, ts }
+  const productsRef = useRef(null); // cache full product list
 
   // Load recent searches from localStorage
   useEffect(() => {
@@ -28,17 +30,29 @@ const SearchAutocomplete = ({ onClose }) => {
     }
   }, []);
 
-  // Fetch search suggestions
+  // Fetch search suggestions with simple in-memory cache (5 min TTL)
   const fetchSuggestions = async (searchQuery) => {
     if (!searchQuery.trim()) {
       setSuggestions([]);
       return;
     }
 
+    const normalized = searchQuery.trim().toLowerCase();
+    const cached = cacheRef.current.get(normalized);
+    const now = Date.now();
+    if (cached && now - cached.ts < 5 * 60 * 1000) {
+      setSuggestions(cached.data);
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const response = await productsAPI.getAll();
-      const products = response.data.products || [];
+      // Fetch once and reuse
+      if (!productsRef.current) {
+        const response = await productsAPI.getAll();
+        productsRef.current = response.data.products || [];
+      }
+      const products = productsRef.current;
       
       const filtered = products.filter(product =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -46,6 +60,7 @@ const SearchAutocomplete = ({ onClose }) => {
       ).slice(0, 5);
 
       setSuggestions(filtered);
+      cacheRef.current.set(normalized, { data: filtered, ts: now });
     } catch (error) {
       console.error('Error fetching suggestions:', error);
       setSuggestions([]);
@@ -58,7 +73,7 @@ const SearchAutocomplete = ({ onClose }) => {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchSuggestions(query);
-    }, 300);
+    }, 250);
 
     return () => clearTimeout(timeoutId);
   }, [query]);

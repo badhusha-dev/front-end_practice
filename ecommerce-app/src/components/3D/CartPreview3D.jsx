@@ -4,7 +4,8 @@ import { OrbitControls, Center, Text, ContactShadows } from '@react-three/drei';
 import { animated, useSpring } from '@react-spring/three';
 import * as THREE from 'three';
 import { MdShoppingCart, MdClose, MdRemove, MdAdd } from 'react-icons/md';
-import { useCartStore } from '../../features/cart/cartStore';
+import { useCart } from '../../hooks/reduxHooks';
+import { removeFromCart, updateCartItemQuantity } from '../../features/cart/cartSlice';
 
 // 3D Cart Item Component
 const CartItem3D = ({ item, position, onRemove, onUpdateQuantity }) => {
@@ -140,18 +141,18 @@ const FloatingCartIcon = ({ itemCount, position }) => {
 
 // Main Cart Preview Component
 const CartPreview3D = ({ isOpen, onClose }) => {
-  const { items, itemCount, total, removeItem, updateQuantity } = useCartStore();
+  const { items, itemCount, total, dispatch } = useCart();
   const [selectedItem, setSelectedItem] = useState(null);
 
   const handleRemoveItem = (itemId) => {
-    removeItem(itemId);
+    dispatch(removeFromCart(itemId));
   };
 
   const handleUpdateQuantity = (itemId, quantity) => {
     if (quantity <= 0) {
-      removeItem(itemId);
+      dispatch(removeFromCart(itemId));
     } else {
-      updateQuantity(itemId, quantity);
+      dispatch(updateCartItemQuantity({ productId: itemId, quantity }));
     }
   };
 

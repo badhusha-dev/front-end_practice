@@ -5,7 +5,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { toast } from 'react-toastify';
 import { MdVisibility, MdVisibilityOff, MdMail, MdLock } from 'react-icons/md';
-import { useAuthStore } from './authStore';
+import { useAuth } from '../../hooks/reduxHooks';
+import { loginAsync } from './authSlice';
 import Loading from '../../components/Loading';
 
 // Validation schema for login form
@@ -22,7 +23,7 @@ const loginSchema = yup.object({
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const { login, isLoading, isAuthenticated } = useAuthStore();
+  const { dispatch, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -43,14 +44,14 @@ const LoginPage = () => {
   }, [isAuthenticated, navigate, location]);
 
   const onSubmit = async (data) => {
-    const result = await login(data.email, data.password);
+    const result = await dispatch(loginAsync({ email: data.email, password: data.password }));
     
-    if (result.success) {
+    if (result.type.endsWith('/fulfilled')) {
       toast.success('Login successful!');
       const from = location.state?.from?.pathname || '/';
       navigate(from, { replace: true });
     } else {
-      toast.error(result.error || 'Login failed');
+      toast.error(result.payload || 'Login failed');
     }
   };
 

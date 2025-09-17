@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+body { margin: 0; }
+
+:root {
+  --cimb-red: #D71920;
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+body[data-bs-theme='light'] {
+  --bs-body-bg: #f6f8fb;
+  --bs-body-color: #1f2937;
+}
+body[data-bs-theme='dark'] {
+  --bs-body-bg: #0f172a;
+  --bs-body-color: #e5e7eb;
+}
+
+body {
+  font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  border-radius: 16px;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.glass-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+
+.btn-primary { background-color: var(--cimb-red); border-color: var(--cimb-red); }
+.btn-primary:hover { background-color: #b0171d; border-color: #b0171d; }

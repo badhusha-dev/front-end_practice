@@ -1,12 +1,13 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, lazy, Suspense } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { MdSearch, MdFilterList, MdGridOn, MdList, MdSort } from 'react-icons/md';
 import { productsAPI } from '../../api/api';
 import ProductCard from './ProductCard';
+import ProductCardSkeleton from './ProductCardSkeleton';
 import Loading, { InlineLoading } from '../../components/Loading';
 import { ErrorMessage, EmptyState } from '../../components/ErrorBoundary';
 import ProductFilters from '../../components/ProductFilters';
-import ProductGallery3D from '../../components/3D/ProductGallery3D';
+const ProductGallery3D = lazy(() => import('../../components/3D/ProductGallery3D'));
 import AIRecommendations from '../../components/AIRecommendations';
 import { MdInventory, MdViewInAr } from 'react-icons/md';
 
@@ -15,6 +16,8 @@ const ProductList = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [show3DGallery, setShow3DGallery] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [filters, setFilters] = useState({
     category: '',
     brand: '',
@@ -129,9 +132,7 @@ const ProductList = () => {
   }, [productsData, searchTerm, filters]);
 
 
-  if (productsLoading || categoriesLoading) {
-    return <InlineLoading text="Loading products..." />;
-  }
+  const isInitialLoading = productsLoading || categoriesLoading;
 
   if (productsError) {
     return <ErrorMessage error={productsError} onRetry={refetchProducts} />;
@@ -212,7 +213,17 @@ const ProductList = () => {
           </div>
 
           {/* Products Grid/List */}
-          {filteredAndSortedProducts.length === 0 ? (
+          {isInitialLoading ? (
+            <div className={
+              viewMode === 'grid'
+                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+                : 'space-y-4'
+            }>
+              {(Array.from({ length: viewMode === 'grid' ? 8 : 6 })).map((_, idx) => (
+                <ProductCardSkeleton key={idx} />
+              ))}
+            </div>
+          ) : filteredAndSortedProducts.length === 0 ? (
             <EmptyState
               icon={MdInventory}
               title="No products found"
@@ -251,16 +262,18 @@ const ProductList = () => {
 
       {/* 3D Gallery Modal */}
       {show3DGallery && (
-        <ProductGallery3D
-          products={filteredAndSortedProducts}
-          onProductSelect={(product) => {
-            setSelectedProduct(product);
-            setShow3DGallery(false);
-            // Navigate to product detail
-            window.location.href = `/products/${product.id}`;
-          }}
-          onClose={() => setShow3DGallery(false)}
-        />
+        <Suspense fallback={null}>
+          <ProductGallery3D
+            products={filteredAndSortedProducts}
+            onProductSelect={(product) => {
+              setSelectedProduct(product);
+              setShow3DGallery(false);
+              // Navigate to product detail
+              window.location.href = `/products/${product.id}`;
+            }}
+            onClose={() => setShow3DGallery(false)}
+          />
+        </Suspense>
       )}
     </div>
   );

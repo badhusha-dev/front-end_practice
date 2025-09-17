@@ -1,0 +1,405 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400;500&display=swap');
+
+/* CIMB Theme Variables */
+:root {
+  /* CIMB Brand Colors */
+  --cimb-red: #E31837;
+  --cimb-dark: #1C1C1C;
+  --cimb-gray: #F4F6F8;
+  --cimb-white: #FFFFFF;
+  --cimb-gold: #F4C542;
+  --cimb-teal: #2FBF71;
+  
+  /* Typography */
+  --font-heading: 'Poppins', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'Roboto Mono', monospace;
+  
+  /* Light Theme */
+  --bg-primary: var(--cimb-gray);
+  --bg-secondary: var(--cimb-white);
+  --text-primary: var(--cimb-dark);
+  --text-secondary: #6B7280;
+  --border-color: #E5E7EB;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.2);
+}
+
+/* Dark Theme */
+[data-bs-theme="dark"] {
+  --bg-primary: #121212;
+  --bg-secondary: #1E1E1E;
+  --text-primary: #FFFFFF;
+  --text-secondary: #9CA3AF;
+  --border-color: #374151;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
+  --glass-bg: rgba(30, 30, 30, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+/* Global Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.financial-data {
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* CIMB Button Styles */
+.btn-cimb-primary {
+  background: linear-gradient(135deg, var(--cimb-red), #C41E3A);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-cimb-primary:hover {
+  background: linear-gradient(135deg, #C41E3A, var(--cimb-red));
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  color: white;
+}
+
+.btn-cimb-success {
+  background: linear-gradient(135deg, var(--cimb-teal), #26A69A);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-cimb-success:hover {
+  background: linear-gradient(135deg, #26A69A, var(--cimb-teal));
+  transform: translateY(-1px);
+  color: white;
+}
+
+/* Neumorphism Elements */
+.neu-button {
+  background: var(--bg-secondary);
+  border: none;
+  border-radius: 12px;
+  box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.1), -8px -8px 16px rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.neu-button:hover {
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1), -4px -4px 8px rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .neu-button {
+  box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.3), -8px -8px 16px rgba(255, 255, 255, 0.05);
+}
+
+[data-bs-theme="dark"] .neu-button:hover {
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3), -4px -4px 8px rgba(255, 255, 255, 0.05);
+}
+
+/* AG-Grid Customization */
+.ag-theme-quartz {
+  --ag-background-color: var(--bg-secondary);
+  --ag-header-background-color: var(--bg-secondary);
+  --ag-odd-row-background-color: rgba(0, 0, 0, 0.02);
+  --ag-border-color: var(--border-color);
+  --ag-header-foreground-color: var(--text-primary);
+  --ag-foreground-color: var(--text-primary);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.ag-theme-quartz .ag-header {
+  border-bottom: 2px solid var(--cimb-red);
+}
+
+.ag-theme-quartz .ag-row:hover {
+  background-color: rgba(227, 24, 55, 0.05);
+}
+
+/* Chart Colors */
+.chart-positive {
+  color: var(--cimb-teal);
+}
+
+.chart-negative {
+  color: var(--cimb-red);
+}
+
+.chart-neutral {
+  color: var(--cimb-gold);
+}
+
+/* Sidebar Styling */
+.sidebar-cimb {
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+}
+
+.sidebar-cimb .nav-link {
+  color: var(--text-secondary);
+  border-radius: 8px;
+  margin: 2px 8px;
+  transition: all 0.3s ease;
+}
+
+.sidebar-cimb .nav-link:hover {
+  background: rgba(227, 24, 55, 0.1);
+  color: var(--cimb-red);
+}
+
+.sidebar-cimb .nav-link.active {
+  background: var(--cimb-red);
+  color: white;
+}
+
+/* Navbar Styling */
+.navbar-cimb {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Mobile-First Optimizations */
+@media (max-width: 768px) {
+  .glass-card {
+    border-radius: 12px;
+    margin-bottom: 1rem;
+  }
+  
+  .btn-cimb-primary,
+  .btn-cimb-success {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+
+  .sidebar-cimb {
+    position: fixed;
+    top: 0;
+    left: -240px;
+    z-index: 1040;
+    transition: left 0.3s ease;
+  }
+
+  .sidebar-cimb.show {
+    left: 0;
+  }
+
+  .navbar-cimb {
+    padding: 0.5rem 1rem;
+  }
+
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Touch-friendly elements */
+  .btn, .nav-link, .form-control, .form-select {
+    min-height: 44px;
+  }
+
+  /* Swipe gestures for mobile */
+  .swipeable {
+    touch-action: pan-x;
+  }
+
+  /* Mobile-specific animations */
+  .mobile-slide-in {
+    animation: slideInFromRight 0.3s ease-out;
+  }
+
+  @keyframes slideInFromRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* Responsive grid adjustments */
+  .row.g-3 {
+    --bs-gutter-x: 0.75rem;
+    --bs-gutter-y: 0.75rem;
+  }
+
+  /* Mobile notification positioning */
+  .position-fixed.top-0.end-0 {
+    top: 1rem !important;
+    right: 1rem !important;
+  }
+
+  /* Mobile-friendly modal */
+  .modal-dialog {
+    margin: 0.5rem;
+    max-width: calc(100% - 1rem);
+  }
+
+  /* Mobile table responsiveness */
+  .table-responsive {
+    font-size: 0.85rem;
+  }
+
+  /* Mobile chart containers */
+  .ag-theme-quartz {
+    height: 250px !important;
+  }
+
+  /* Mobile dashboard widgets */
+  .col-6.col-md-3 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+
+  .col-12.col-md-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .glass-card {
+    border-radius: 14px;
+  }
+
+  .container {
+    max-width: 95%;
+  }
+
+  .sidebar-cimb {
+    width: 200px;
+  }
+
+  .col-lg-8 {
+    flex: 0 0 66.666667%;
+    max-width: 66.666667%;
+  }
+
+  .col-lg-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .glass-card:hover {
+    transform: none;
+  }
+
+  .btn-cimb-primary:hover,
+  .btn-cimb-success:hover {
+    transform: none;
+  }
+
+  /* Larger touch targets */
+  .btn-sm {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+  }
+
+  /* Remove hover effects on touch devices */
+  .nav-link:hover {
+    background: transparent;
+    color: inherit;
+  }
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .glass-card {
+    backdrop-filter: blur(12px);
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .glass-card:hover {
+    transform: none;
+  }
+}
+
+/* Dark mode mobile optimizations */
+[data-bs-theme="dark"] {
+  @media (max-width: 768px) {
+    .glass-card {
+      background: rgba(30, 30, 30, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .sidebar-cimb {
+      background: var(--bg-secondary);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+  }
+}

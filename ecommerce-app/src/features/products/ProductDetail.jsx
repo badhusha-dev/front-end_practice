@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
@@ -17,11 +17,12 @@ import {
   MdVisibilityOff
 } from 'react-icons/md';
 import { productsAPI } from '../../api/api';
-import { useCartStore } from '../cart/cartStore';
+import { useCart } from '../../hooks/reduxHooks';
+import { addToCart } from '../cart/cartSlice';
 import ProductReviews from '../../components/ProductReviews';
 import Loading, { PageLoading } from '../../components/Loading';
 import { ErrorMessage } from '../../components/ErrorBoundary';
-import ProductShowcase3D from '../../components/3D/ProductShowcase3D';
+const ProductShowcase3D = lazy(() => import('../../components/3D/ProductShowcase3D'));
 import ProductDebugger from '../../components/ProductDebugger';
 import ReviewForm from '../reviews/ReviewForm';
 import ReviewsList from '../reviews/ReviewsList';
@@ -34,7 +35,14 @@ const ProductDetail = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [show3DView, setShow3DView] = useState(false);
   
-  const { addItem, isInCart, getItemQuantity } = useCartStore();
+  const { dispatch: cartDispatch, items: cartItems } = useCart();
+  
+  // Helper functions
+  const isInCart = cartItems.some(item => item.id === product?.id);
+  const getItemQuantity = (productId) => {
+    const item = cartItems.find(item => item.id === productId);
+    return item ? item.quantity : 0;
+  };
 
   // Fetch product data
   const {
@@ -84,7 +92,7 @@ const ProductDetail = () => {
   const handleAddToCart = () => {
     if (!product) return;
     
-    addItem(product, quantity);
+    cartDispatch(addToCart(product));
     toast.success(`${product.name} added to cart!`);
   };
 
@@ -155,11 +163,13 @@ const ProductDetail = () => {
 
           {show3DView ? (
             /* 3D Product Showcase */
-            <ProductShowcase3D 
-              products={[product]} 
-              selectedProduct={product}
-              className="w-full h-96 rounded-lg overflow-hidden"
-            />
+            <Suspense fallback={null}>
+              <ProductShowcase3D 
+                products={[product]} 
+                selectedProduct={product}
+                className="w-full h-96 rounded-lg overflow-hidden"
+              />
+            </Suspense>
           ) : (
             /* Traditional Image View */
             <>
