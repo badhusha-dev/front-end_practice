@@ -53,7 +53,7 @@
               <a :href="personalInfo.github" target="_blank" class="btn btn-outline-dark me-2">
                 <i class="fab fa-github me-1"></i>GitHub
               </a>
-              <a :href="personalInfo.cv" target="_blank" class="btn btn-primary">
+              <a :href="personalInfo.cv" download class="btn btn-primary">
                 <i class="fas fa-download me-1"></i>Download CV
               </a>
             </div>

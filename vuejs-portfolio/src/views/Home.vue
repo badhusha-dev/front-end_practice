@@ -66,6 +66,17 @@
       </div>
     </section>
 
+    <!-- 3D Interactive Section -->
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title">Interactive 3D</h2>
+        <ThreeScene @element-click="onThreeElementClick" />
+        <div class="text-center mt-3 text-muted">
+          Tip: Scroll, move the mouse, or click the shapes.
+        </div>
+      </div>
+    </section>
+
     <!-- Featured Projects Section -->
     <section class="section">
       <div class="container">
@@ -141,6 +152,7 @@
 <script>
 import Hero from '../components/Hero.vue'
 import ProjectCard from '../components/ProjectCard.vue'
+import ThreeScene from '../components/ThreeScene.vue'
 import { personalInfo } from '../data/personal.js'
 import { projects } from '../data/projects.js'
 import { experiences } from '../data/experience.js'
@@ -149,7 +161,8 @@ export default {
   name: 'Home',
   components: {
     Hero,
-    ProjectCard
+    ProjectCard,
+    ThreeScene
   },
   data() {
     return {
@@ -184,6 +197,16 @@ export default {
     },
     recentExperience() {
       return experiences.slice(0, 3)
+    }
+  }
+  ,
+  methods: {
+    onThreeElementClick(name) {
+      if (name === 'projects') {
+        this.$router.push('/projects')
+      } else if (name === 'experience') {
+        this.$router.push('/experience')
+      }
     }
   }
 }

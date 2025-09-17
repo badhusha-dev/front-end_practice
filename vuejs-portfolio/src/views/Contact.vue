@@ -64,7 +64,7 @@
                 <a :href="personalInfo.github" target="_blank" class="social-link" title="GitHub">
                   <i class="fab fa-github"></i>
                 </a>
-                <a :href="personalInfo.cv" target="_blank" class="social-link" title="Download CV">
+                <a :href="personalInfo.cv" download class="social-link" title="Download CV">
                   <i class="fas fa-download"></i>
                 </a>
                 <a href="mailto:{{ personalInfo.email }}" class="social-link" title="Email">
@@ -319,33 +319,33 @@ export default {
       return emailRegex.test(email)
     },
     async submitForm() {
-      if (!this.validateForm()) {
-        return
-      }
-      
+      if (!this.validateForm()) return
       this.isSubmitting = true
-      
+
       try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000))
-        
-        // Reset form
-        this.form = {
-          name: '',
-          email: '',
-          phone: '',
-          subject: '',
-          message: '',
-          newsletter: false
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: this.form.name,
+            email: this.form.email,
+            phone: this.form.phone,
+            subject: this.form.subject,
+            message: this.form.message
+          })
+        })
+
+        let payload = {}
+        try { payload = await response.json() } catch (e) {}
+        if (!response.ok) throw new Error('Network error')
+        if (payload && payload.ok === false) {
+          // Mail send failed but API responded. Show soft success to user.
+          console.warn('Mail delivery failed, but request accepted.')
         }
-        
+
+        this.form = { name: '', email: '', phone: '', subject: '', message: '', newsletter: false }
         this.showSuccess = true
-        
-        // Hide success message after 5 seconds
-        setTimeout(() => {
-          this.showSuccess = false
-        }, 5000)
-        
+        setTimeout(() => { this.showSuccess = false }, 5000)
       } catch (error) {
         console.error('Error submitting form:', error)
         alert('There was an error sending your message. Please try again.')

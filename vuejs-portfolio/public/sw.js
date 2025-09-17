@@ -1,4 +1,4 @@
-const CACHE_NAME = 'shahul-portfolio-v1'
+const CACHE_NAME = 'shahul-portfolio-v2'
 const urlsToCache = [
   '/',
   '/about',
@@ -23,42 +23,46 @@ self.addEventListener('install', (event) => {
         console.log('Cache install failed:', error)
       })
   )
+  self.skipWaiting()
 })
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        if (response) {
-          return response
+  const { request } = event
+
+  // Only handle same-origin GET requests; skip dev Vite/HMR endpoints
+  const url = new URL(request.url)
+  const isSameOrigin = url.origin === self.location.origin
+  const isGET = request.method === 'GET'
+  const isVite = url.pathname.startsWith('/@vite') || url.pathname.includes('vite')
+
+  if (!isSameOrigin || !isGET || isVite) {
+    return
+  }
+
+  event.respondWith((async () => {
+    try {
+      const cached = await caches.match(request)
+      if (cached) return cached
+
+      const networkResponse = await fetch(request)
+      try {
+        if (networkResponse && networkResponse.ok && networkResponse.type === 'basic') {
+          const cache = await caches.open(CACHE_NAME)
+          cache.put(request, networkResponse.clone())
         }
-        
-        return fetch(event.request).then((response) => {
-          // Check if valid response
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response
-          }
-
-          // Clone the response
-          const responseToCache = response.clone()
-
-          caches.open(CACHE_NAME)
-            .then((cache) => {
-              cache.put(event.request, responseToCache)
-            })
-
-          return response
-        })
-      })
-      .catch(() => {
-        // Return offline page for navigation requests
-        if (event.request.mode === 'navigate') {
-          return caches.match('/')
-        }
-      })
-  )
+      } catch (e) {
+        // Cache put errors ignored
+      }
+      return networkResponse
+    } catch (e) {
+      if (request.mode === 'navigate') {
+        const cachedRoot = await caches.match('/')
+        if (cachedRoot) return cachedRoot
+      }
+      return new Response('', { status: 504, statusText: 'Offline' })
+    }
+  })())
 })
 
 // Activate event - clean up old caches
@@ -75,6 +79,7 @@ self.addEventListener('activate', (event) => {
       )
     })
   )
+  self.clients.claim()
 })
 
 // Background sync for form submissions

@@ -9,7 +9,7 @@ export const blogPosts = [
     tags: ["Java", "Spring Boot", "Microservices", "Architecture"],
     readTime: "8 min read",
     featured: true,
-    image: "/images/blog/microservices-guide.jpg"
+    image: "/images/blog/microservices-guide.svg"
   },
   {
     id: 2,
@@ -21,7 +21,7 @@ export const blogPosts = [
     tags: ["Java", "Database", "Performance", "Optimization"],
     readTime: "6 min read",
     featured: false,
-    image: "/images/blog/database-optimization.jpg"
+    image: "/images/blog/database-optimization.svg"
   },
   {
     id: 3,
@@ -33,7 +33,7 @@ export const blogPosts = [
     tags: ["Java", "Spring Boot", "Security", "JWT"],
     readTime: "7 min read",
     featured: true,
-    image: "/images/blog/jwt-authentication.jpg"
+    image: "/images/blog/jwt-authentication.svg"
   },
   {
     id: 4,
@@ -45,7 +45,7 @@ export const blogPosts = [
     tags: ["Docker", "Java", "DevOps", "Containerization"],
     readTime: "5 min read",
     featured: false,
-    image: "/images/blog/docker-java.jpg"
+    image: "/images/blog/docker-java.svg"
   },
   {
     id: 5,
@@ -57,7 +57,7 @@ export const blogPosts = [
     tags: ["Java", "WebSocket", "Real-time", "Spring Boot"],
     readTime: "9 min read",
     featured: false,
-    image: "/images/blog/websocket-realtime.jpg"
+    image: "/images/blog/websocket-realtime.svg"
   },
   {
     id: 6,
@@ -69,6 +69,6 @@ export const blogPosts = [
     tags: ["API Design", "REST", "Best Practices", "Documentation"],
     readTime: "10 min read",
     featured: true,
-    image: "/images/blog/api-design.jpg"
+    image: "/images/blog/api-design.svg"
   }
 ]

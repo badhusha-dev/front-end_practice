@@ -47,8 +47,8 @@ app.use(router)
 // Mount the app
 app.mount('#app')
 
-// Register service worker for PWA
-if ('serviceWorker' in navigator) {
+// Register service worker only in production to avoid dev interference
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
@@ -57,5 +57,11 @@ if ('serviceWorker' in navigator) {
       .catch((registrationError) => {
         console.log('SW registration failed: ', registrationError)
       })
+  })
+}
+// Ensure dev environment doesn't keep an old service worker around
+if (!import.meta.env.PROD && 'serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    registrations.forEach(r => r.unregister())
   })
 }

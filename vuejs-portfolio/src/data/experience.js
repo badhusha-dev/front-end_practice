@@ -1,53 +1,53 @@
 export const experiences = [
   {
     id: 1,
-    role: "Senior Java Backend Developer",
-    company: "TechCorp Solutions",
-    duration: "Jan 2022 - Present",
-    location: "Mumbai, India",
+    role: "Software Engineer",
+    company: "Nexroar Services Sdn Bhd",
+    duration: "Nov 2024 - Present",
+    location: "Kuala Lumpur, Malaysia",
     type: "Full-time",
     responsibilities: [
-      "Led development of microservices architecture using Spring Boot and Spring Cloud",
-      "Designed and implemented RESTful APIs serving 100K+ daily requests",
-      "Optimized database queries resulting in 40% performance improvement",
-      "Mentored junior developers and conducted code reviews",
-      "Collaborated with cross-functional teams in Agile environment",
-      "Implemented CI/CD pipelines using Jenkins and Docker"
+      "Developed enterprise web applications with Spring & PrimeFaces, improving data entry efficiency by 25%",
+      "Built reusable form-driven modules with real-time validation and dynamic layouts",
+      "Integrated Oracle DB with Spring Data JPA, Hibernate, and JDBC",
+      "Collaborated with cross-functional teams to deliver scalable solutions",
+      "Implemented best practices for code quality and performance optimization",
+      "Participated in agile development processes and sprint planning"
     ],
-    technologies: ["Java 11", "Spring Boot", "Spring Cloud", "PostgreSQL", "Redis", "Docker", "AWS", "Jenkins"]
+    technologies: ["Java", "Spring Framework", "PrimeFaces", "Oracle DB", "Spring Data JPA", "Hibernate", "JDBC"]
   },
   {
     id: 2,
-    role: "Java Backend Developer",
-    company: "InnovateTech Pvt Ltd",
-    duration: "Jun 2020 - Dec 2021",
-    location: "Pune, India",
+    role: "Software Engineer",
+    company: "SoftInnovation Sdn Bhd",
+    duration: "Nov 2023 - Nov 2024",
+    location: "Cyberjaya, Malaysia",
     type: "Full-time",
     responsibilities: [
-      "Developed enterprise applications using Spring Framework",
-      "Integrated third-party APIs and payment gateways",
-      "Implemented security features using Spring Security",
-      "Participated in system design and architecture decisions",
-      "Wrote comprehensive unit and integration tests",
-      "Deployed applications on cloud platforms"
+      "Backend lead for accounting application (SMEs), implementing financial modules (GL, invoicing, reconciliation)",
+      "Designed REST APIs with Spring Boot & JWT authentication",
+      "Integrated MySQL, Jasper Reports, and optimized stored procedures",
+      "Led technical decisions and architecture design for financial modules",
+      "Mentored junior developers and conducted code reviews",
+      "Ensured compliance with financial reporting standards and regulations"
     ],
-    technologies: ["Java 8", "Spring MVC", "Spring Security", "MySQL", "Maven", "Git", "Linux"]
+    technologies: ["Java", "Spring Boot", "JWT Authentication", "MySQL", "Jasper Reports", "REST API", "Spring Security"]
   },
   {
     id: 3,
-    role: "Junior Java Developer",
-    company: "StartupXYZ",
-    duration: "Jan 2019 - May 2020",
-    location: "Bangalore, India",
+    role: "Software Developer",
+    company: "Makinus",
+    duration: "Aug 2021 - Oct 2023",
+    location: "Tamil Nadu, India",
     type: "Full-time",
     responsibilities: [
-      "Developed web applications using Java and Spring Boot",
-      "Worked with relational databases and wrote SQL queries",
-      "Participated in Agile development process",
-      "Collaborated with frontend developers for API integration",
-      "Learned and applied best practices in software development",
-      "Contributed to bug fixes and feature enhancements"
+      "Built backend for e-commerce platforms with multi-role APIs using Spring Boot and JWT",
+      "Integrated Razorpay, Pinelabs, AWS S3 for payments and storage solutions",
+      "Developed Shopify-integrated admin portal with real-time inventory and order synchronization",
+      "Implemented Kafka for real-time data processing and Redis for caching",
+      "Created automated stock workflows and inventory management systems",
+      "Collaborated with frontend teams for seamless API integration"
     ],
-    technologies: ["Java 8", "Spring Boot", "MySQL", "HTML", "CSS", "JavaScript", "Git"]
+    technologies: ["Java", "Spring Boot", "JWT", "Kafka", "Redis", "AWS S3", "Razorpay", "MySQL", "Shopify API"]
   }
 ]
